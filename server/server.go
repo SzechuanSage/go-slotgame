@@ -5,15 +5,15 @@ import (
 	"szechuansage/slotgame"
 )
 
-var c = slotgame.GetConfig()
+var config = slotgame.GetConfig()
 
-var reels = c.Reels()
-var reelSet = c.ReelSet("reels")
+var reels = config.Reels()
+var reelSet = config.ReelSet("reels")
 
-var r = slotgame.InitReport(c.Symbols(), c.Reels())
+var report = slotgame.InitReport(config.Symbols(), config.Reels())
 
-var indexes = make([]int, c.Reels())
-var loopTo = make([]int, c.Reels())
+var indexes = make([]int, config.Reels())
+var loopTo = make([]int, config.Reels())
 var endOfSequence = false
 
 func hasNextSequence() bool {
@@ -48,7 +48,7 @@ func setNextReelView() []map[string]int {
 	if !isNextSequence() {
 		endOfSequence = true
 	}
-	_, symbolView := c.GetReelView(indexes, "reels")
+	_, symbolView := config.GetReelView(indexes, "reels")
 	if !endOfSequence {
 		advanceSequence()
 	}
@@ -68,16 +68,16 @@ func SequenceTest() {
 	for hasNextSequence() {
 		symbolView = setNextReelView()
 
-		r.AccumulateTotal("count", 1)
+		report.AccumulateTotal("count", 1)
 
 		scatters = 0
 		for _, symbols := range symbolView {
 			scatters += symbols["S"]
 		}
-		r.AccumulateCombinations("S", scatters, 1)
+		report.AccumulateCombinations("S", scatters, 1)
 
 		for symbol, symbolC := range symbolView[0] {
-			if c.SymbolIsWay(symbol) {
+			if config.SymbolIsWay(symbol) {
 				times = int32(symbolC)
 				ofAKind = 1
 				for index, reels := range symbolView[1:] {
@@ -87,23 +87,23 @@ func SequenceTest() {
 					times *= int32(reels[symbol] + reels["Z"])
 					ofAKind = index + 2
 				}
-				r.AccumulateCombinations(symbol, ofAKind, times)
+				report.AccumulateCombinations(symbol, ofAKind, times)
 			}
 		}
 	}
 
-	for _, symbol := range c.Symbols() {
-		var payTable = c.SymbolPays(symbol)
+	for _, symbol := range config.Symbols() {
+		var payTable = config.SymbolPays(symbol)
 		for count, pay := range payTable {
-			var c = r.GetCombinations(symbol, count+1)
-			r.AccumulatePays(symbol, count+1, int64(c) * int64(pay))
+			var c = report.GetCombinations(symbol, count+1)
+			report.AccumulatePays(symbol, count+1, int64(c) * int64(pay))
 		}
 	}
 
 	fmt.Println(symbolView)
-	r.PrintTotals()
+	report.PrintTotals()
 	fmt.Println("Combinations")
-	r.PrintCombinations()
+	report.PrintCombinations()
 	fmt.Println("Pays")
-	r.PrintPays()
+	report.PrintPays()
 }
