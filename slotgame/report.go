@@ -25,7 +25,7 @@ func InitReport(symbols []string, reels int) Report {
 
 	report.combinations = make(map[string][]int32)
 	report.pays = make(map[string][]int64)
-	report.symbols = append(symbols)
+	report.symbols = append(report.symbols, symbols...)
 
 	for _, symbol := range symbols {
 		report.combinations[symbol] = make([]int32, reels+1)

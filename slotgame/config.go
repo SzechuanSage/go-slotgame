@@ -116,7 +116,7 @@ func makeReelDisplay(r reelSet) [][][]string {
 		reelDisplay[index] = make([][]string, len(reel))
 		doubleReel := append(reel, reel...)
 		for i := 0; i < len(reel); i++ {
-			reelDisplay[index][i] = append(doubleReel[i : i+r.rows[index]])
+			reelDisplay[index][i] = append(reelDisplay[index][i], doubleReel[i : i+r.rows[index]]...)
 		}
 	}
 	return reelDisplay
