@@ -6,19 +6,44 @@ import (
 	"os"
 )
 
-func ConfigLoader(file string) (map[string]interface{}, error) {
+type GameSymbol struct {
+	Symbol string
+	Value  string
+	Pays   []int
+}
+
+type GameWild struct {
+	Symbol     string
+	Multiplier int
+}
+
+type GameScatter struct {
+	Symbol string
+}
+
+type Game struct {
+	Name      string
+	Symbols   []GameSymbol
+	Wilds     []GameWild
+	Scatters  []GameScatter
+	Base      [][]string
+	FreeReels [][]string
+}
+
+func ConfigLoader(file string) (Game, error) {
+	var game Game
+
 	content, err := os.ReadFile(file)
 	if err != nil {
 		log.Printf("Error when opening file: %v", err)
-		return nil, err
+		return game, err
 	}
 
-	var config map[string]interface{}
-	err = json.Unmarshal(content, &config)
+	err = json.Unmarshal(content, &game)
 	if err != nil {
 		log.Printf("Error during Unmarshal(): %v", err)
-		return nil, err
+		return game, err
 	}
 
-	return config, err
+	return game, err
 }

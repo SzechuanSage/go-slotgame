@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"log"
 	"szechuansage/slotgame"
 )
 
@@ -55,8 +56,13 @@ func setNextReelView() []map[string]int {
 	return symbolView
 }
 
-func Init() {
-	config = slotgame.GetConfig()
+func Init(game string) {
+	gameConfig, err := slotgame.ConfigLoader(game)
+	if err != nil {
+		log.Fatal("Error when loading config: ", err)
+	}
+
+	config = slotgame.GetConfig(gameConfig)
 
 	reels = config.Reels()
 	reelSet = config.ReelSet("reels")

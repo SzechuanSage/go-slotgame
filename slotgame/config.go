@@ -30,26 +30,23 @@ type reelSet struct {
 }
 
 // GetConfig returns the configuration for a slot server
-func GetConfig() Config {
+func GetConfig(gameConfig Game) Config {
 	var config = Config{}
 	config.symbols = make(map[string]symbol)
 	config.scatters = make([]string, 0)
 	config.reelSets = make(map[string]reelSet)
 
-	config.symbols["Z"] = makeSymbol("Z", "Z", []int{0, 0, 0, 0, 0})
-	config.symbols["B"] = makeSymbol("B", "B", []int{0, 0, 100, 200, 300})
-	config.symbols["C"] = makeSymbol("C", "C", []int{0, 0, 50, 150, 250})
-	config.symbols["D"] = makeSymbol("D", "D", []int{0, 0, 30, 100, 200})
-	config.symbols["E"] = makeSymbol("E", "E", []int{0, 0, 20, 50, 150})
-	config.symbols["A"] = makeSymbol("A", "A", []int{0, 0, 20, 50, 150})
-	config.symbols["K"] = makeSymbol("K", "K", []int{0, 0, 15, 30, 125})
-	config.symbols["Q"] = makeSymbol("Q", "Q", []int{0, 0, 10, 20, 100})
-	config.symbols["J"] = makeSymbol("J", "J", []int{0, 0, 10, 20, 100})
-	config.symbols["T"] = makeSymbol("T", "T", []int{0, 0, 5, 15, 100})
-	config.symbols["N"] = makeSymbol("N", "N", []int{0, 0, 5, 15, 100})
-	config.symbols["S"] = makeSymbol("S", "S", []int{0, 0, 2, 10, 50})
-	makeWild(config, "Z", 1)
-	config = makeScatter(config, "S")
+	for _, symbol := range gameConfig.Symbols {
+		config.symbols[symbol.Symbol] = makeSymbol(symbol.Symbol, symbol.Value, symbol.Pays)
+	}
+
+	for _, wild := range gameConfig.Wilds {
+		makeWild(config, wild.Symbol, wild.Multiplier)
+	}
+
+	for _, scatter := range gameConfig.Scatters {
+		config = makeScatter(config, scatter.Symbol)
+	}
 
 	config.symbolIds = make([]string, 0, len(config.symbols))
 	for id := range config.symbols {
@@ -60,11 +57,11 @@ func GetConfig() Config {
 	var baseReelSet = reelSet{}
 	baseReelSet.rows = []int{3, 5, 5, 5, 3}
 	baseReelSet.reels = make([][]string, 5)
-	baseReelSet.reels[0] = []string{"K", "J", "E", "T", "Q", "E", "K", "T", "E", "J", "K", "B", "J", "T", "E", "J", "K", "B", "J", "T", "J", "S", "K", "T", "J", "E", "Q", "J", "C", "K", "J", "Q", "E", "J", "K", "T", "Q", "D", "A", "T", "K", "E", "N", "K", "T", "E", "J", "K", "T", "E", "J", "T", "D", "K", "T", "E", "K", "T", "D", "B"}
-	baseReelSet.reels[1] = []string{"N", "J", "Q", "Z", "N", "T", "A", "Q", "Z", "N", "J", "Q", "A", "C", "S", "A", "C", "Q", "N", "N", "A", "C", "B", "B", "B", "A", "N", "C", "Q", "Q", "K", "A", "C", "J", "Q", "J", "N", "C", "A", "K", "C", "A", "Q", "Q", "C", "D", "N", "A", "N", "C", "C", "J", "A", "J", "K", "K", "C", "N", "B", "B", "B", "Q", "C", "E", "A"}
-	baseReelSet.reels[2] = []string{"N", "T", "T", "A", "B", "B", "B", "B", "B", "A", "J", "K", "J", "E", "T", "N", "E", "A", "K", "T", "D", "Q", "N", "J", "E", "A", "A", "D", "K", "Q", "J", "T", "N", "N", "K", "Q", "B", "B", "B", "B", "B", "N", "J", "T", "T", "E", "A", "A", "A", "N", "K", "K", "E", "E", "Q", "T", "A", "S", "Q", "D", "J", "K", "Q", "S", "E", "A", "N", "N", "Q", "T", "T", "C", "J", "J", "E", "E", "E", "J", "J", "D", "D", "Q", "Q", "K", "N"}
-	baseReelSet.reels[3] = []string{"N", "T", "J", "Q", "Z", "N", "C", "J", "Q", "Z", "N", "T", "J", "Q", "D", "A", "A", "B", "B", "B", "B", "B", "N", "N", "C", "C", "C", "D", "Q", "J", "J", "E", "J", "S", "D", "N", "C", "C", "A", "Q", "Q", "A", "T", "K", "B", "B", "B", "B", "B", "D", "J", "A", "N", "N", "T", "D", "D", "D", "T", "T", "E", "Q", "D", "Q", "C", "J", "N", "N", "C", "C", "T", "C", "T", "Q", "T", "T", "D", "N", "S", "J", "J", "C", "Q", "D", "D"}
-	baseReelSet.reels[4] = []string{"N", "Q", "B", "B", "B", "K", "N", "C", "N", "B", "B", "B", "K", "D", "A", "C", "N", "S", "K", "A", "Q", "C", "N", "E", "T", "K", "A", "C", "C", "N", "A", "A", "K", "C", "T", "N", "T", "J", "C", "C", "N", "T", "B", "B", "B", "C", "K", "N", "J", "A", "N", "C", "A", "D", "D"}
+	baseReelSet.reels[0] = append(baseReelSet.reels[0], gameConfig.Base[0]...)
+	baseReelSet.reels[1] = append(baseReelSet.reels[1], gameConfig.Base[1]...)
+	baseReelSet.reels[2] = append(baseReelSet.reels[2], gameConfig.Base[2]...)
+	baseReelSet.reels[3] = append(baseReelSet.reels[3], gameConfig.Base[3]...)
+	baseReelSet.reels[4] = append(baseReelSet.reels[4], gameConfig.Base[4]...)
 	baseReelSet.reelDisplay = makeReelDisplay(baseReelSet)
 	baseReelSet.symbolCount = makeSymbolCount(baseReelSet.reelDisplay)
 	config.reelSets["reels"] = baseReelSet
@@ -72,11 +69,11 @@ func GetConfig() Config {
 	var freeReelSet = reelSet{}
 	freeReelSet.rows = []int{3, 5, 5, 5, 3}
 	freeReelSet.reels = make([][]string, 5)
-	freeReelSet.reels[0] = []string{"K", "J", "C", "D", "K", "T", "E", "Q", "D", "K", "J", "C", "T", "J", "C", "Q", "J", "S", "Q", "T", "J", "E", "Q", "T", "C", "K", "T", "C", "K", "J", "D", "C", "Q", "E", "T", "A", "D", "N", "J", "E", "T", "J", "B", "Q", "C", "T", "E", "D", "T", "E", "A", "T", "E", "K", "J", "D", "K", "Q", "E", "B"}
-	freeReelSet.reels[1] = []string{"N", "T", "J", "Q", "Z", "Z", "Z", "Z", "Z", "Z", "N", "T", "A", "E", "N", "T", "Q", "A", "N", "A", "S", "A", "C", "E", "N", "C", "T", "B", "Q", "A", "N", "E", "K", "Q", "N", "D", "A", "Q", "E", "K", "N", "A", "Z", "Z", "Z", "Z", "Z", "Z", "K", "N", "N", "Q", "A", "A", "E", "D", "K", "N", "E", "K", "B", "B", "N", "B", "A"}
-	freeReelSet.reels[2] = []string{"N", "B", "T", "B", "B", "A", "A", "K", "E", "J", "J", "T", "T", "N", "E", "A", "J", "K", "T", "D", "Q", "N", "J", "E", "A", "D", "K", "C", "J", "T", "N", "K", "Q", "N", "N", "K", "J", "T", "E", "K", "A", "B", "K", "B", "A", "T", "K", "A", "N", "K", "A", "Q", "D", "T", "A", "S", "Q", "N", "D", "J", "C", "Q", "S", "D", "A", "N", "T", "Q", "D", "T", "J", "C", "Q", "J", "D", "D", "Q", "Q", "E", "J", "Q", "D", "N", "J", "D"}
-	freeReelSet.reels[3] = []string{"N", "T", "J", "Q", "Z", "Z", "Z", "Z", "Z", "Z", "N", "T", "N", "C", "E", "A", "B", "B", "B", "K", "B", "N", "C", "J", "T", "D", "N", "J", "E", "N", "J", "S", "K", "A", "Q", "N", "D", "A", "Q", "A", "E", "T", "K", "J", "E", "Q", "K", "D", "C", "Z", "Z", "Z", "Z", "Z", "Z", "A", "D", "A", "D", "Q", "E", "Q", "J", "E", "K", "T", "D", "N", "D", "T", "K", "C", "J", "T", "B", "A", "B", "J", "T", "E", "S", "K", "C", "Q", "E"}
-	freeReelSet.reels[4] = []string{"N", "Q", "B", "B", "B", "N", "B", "B", "C", "N", "J", "D", "A", "T", "S", "Q", "J", "N", "E", "Q", "K", "E", "Q", "N", "E", "T", "Q", "B", "J", "B", "A", "Q", "E", "N", "B", "Q", "A", "N", "D", "T", "N", "Q", "D", "N", "T", "B", "Q", "J", "E", "A", "N", "B", "T", "Q", "B"}
+	freeReelSet.reels[0] = append(freeReelSet.reels[0], gameConfig.FreeReels[0]...)
+	freeReelSet.reels[1] = append(freeReelSet.reels[1], gameConfig.FreeReels[1]...)
+	freeReelSet.reels[2] = append(freeReelSet.reels[2], gameConfig.FreeReels[2]...)
+	freeReelSet.reels[3] = append(freeReelSet.reels[3], gameConfig.FreeReels[3]...)
+	freeReelSet.reels[4] = append(freeReelSet.reels[4], gameConfig.FreeReels[4]...)
 	freeReelSet.reelDisplay = makeReelDisplay(freeReelSet)
 	freeReelSet.symbolCount = makeSymbolCount(freeReelSet.reelDisplay)
 	config.reelSets["freeReels"] = freeReelSet
@@ -116,7 +113,7 @@ func makeReelDisplay(r reelSet) [][][]string {
 		reelDisplay[index] = make([][]string, len(reel))
 		doubleReel := append(reel, reel...)
 		for i := 0; i < len(reel); i++ {
-			reelDisplay[index][i] = append(reelDisplay[index][i], doubleReel[i : i+r.rows[index]]...)
+			reelDisplay[index][i] = append(reelDisplay[index][i], doubleReel[i:i+r.rows[index]]...)
 		}
 	}
 	return reelDisplay
