@@ -15,6 +15,7 @@ func LoadConfig() {
 }
 
 func RunSequenceTest() {
+	server.Init()
 	server.SequenceTest()
 }
 

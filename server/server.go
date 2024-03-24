@@ -5,16 +5,16 @@ import (
 	"szechuansage/slotgame"
 )
 
-var config = slotgame.GetConfig()
+var config slotgame.Config
 
-var reels = config.Reels()
-var reelSet = config.ReelSet("reels")
+var reels int
+var reelSet [][]string
 
-var report = slotgame.InitReport(config.Symbols(), config.Reels())
+var report slotgame.Report
 
-var indexes = make([]int, config.Reels())
-var loopTo = make([]int, config.Reels())
-var endOfSequence = false
+var indexes []int
+var loopTo []int
+var endOfSequence bool
 
 func hasNextSequence() bool {
 	return !endOfSequence
@@ -53,6 +53,19 @@ func setNextReelView() []map[string]int {
 		advanceSequence()
 	}
 	return symbolView
+}
+
+func Init() {
+	config = slotgame.GetConfig()
+
+	reels = config.Reels()
+	reelSet = config.ReelSet("reels")
+
+	report = slotgame.InitReport(config.Symbols(), config.Reels())
+
+	indexes = make([]int, config.Reels())
+	loopTo = make([]int, config.Reels())
+	endOfSequence = false
 }
 
 func SequenceTest() {
