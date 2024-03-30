@@ -67,6 +67,23 @@ func setRandomReelView() []map[string]int {
 	return symbolView
 }
 
+func produceReport() {
+	for _, symbol := range config.Symbols() {
+		var payTable = config.SymbolPays(symbol)
+		for count, pay := range payTable {
+			var c = report.GetCombinations(symbol, count+1)
+			report.AccumulatePays(symbol, count+1, int64(c) * int64(pay))
+		}
+	}
+
+	fmt.Println(symbolView)
+	report.PrintTotals()
+	fmt.Println("Combinations")
+	report.PrintCombinations()
+	fmt.Println("Pays")
+	report.PrintPays()
+}
+
 func Init(game string) {
 	gameConfig, err := slotgame.ConfigLoader(game)
 	if err != nil {
@@ -121,20 +138,7 @@ func SequenceTest() {
 		}
 	}
 
-	for _, symbol := range config.Symbols() {
-		var payTable = config.SymbolPays(symbol)
-		for count, pay := range payTable {
-			var c = report.GetCombinations(symbol, count+1)
-			report.AccumulatePays(symbol, count+1, int64(c) * int64(pay))
-		}
-	}
-
-	fmt.Println(symbolView)
-	report.PrintTotals()
-	fmt.Println("Combinations")
-	report.PrintCombinations()
-	fmt.Println("Pays")
-	report.PrintPays()
+	produceReport()
 }
 
 // RandomTest performs testSpins spins of a slot game
@@ -171,17 +175,5 @@ func RandomTest(testSpins uint32) {
 		}
 	}
 
-	for _, symbol := range config.Symbols() {
-		var payTable = config.SymbolPays(symbol)
-		for count, pay := range payTable {
-			var c = report.GetCombinations(symbol, count+1)
-			report.AccumulatePays(symbol, count+1, int64(c) * int64(pay))
-		}
-	}
-
-	report.PrintTotals()
-	fmt.Println("Combinations")
-	report.PrintCombinations()
-	fmt.Println("Pays")
-	report.PrintPays()
+	produceReport()
 }
