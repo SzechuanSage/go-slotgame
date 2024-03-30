@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"log"
+	"math/rand"
 	"szechuansage/slotgame"
 )
 
@@ -16,6 +17,8 @@ var report slotgame.Report
 var indexes []int
 var loopTo []int
 var endOfSequence bool
+
+var symbolView []map[string]int
 
 func hasNextSequence() bool {
 	return !endOfSequence
@@ -56,6 +59,14 @@ func setNextReelView() []map[string]int {
 	return symbolView
 }
 
+func setRandomReelView() []map[string]int {
+	for x, y := range loopTo {
+		indexes[x] = rand.Intn(y)
+	}
+	_, symbolView := config.GetReelView(indexes, "reels")
+	return symbolView
+}
+
 func Init(game string) {
 	gameConfig, err := slotgame.ConfigLoader(game)
 	if err != nil {
@@ -72,15 +83,14 @@ func Init(game string) {
 	indexes = make([]int, config.Reels())
 	loopTo = make([]int, config.Reels())
 	endOfSequence = false
-}
 
-func SequenceTest() {
 	for x, y := range reelSet {
 		loopTo[x] = len(y)
 	}
+}
 
-	var symbolView []map[string]int
-	var times int32
+func SequenceTest() {
+	var times int64
 	var ofAKind int
 	var scatters int
 
@@ -97,13 +107,13 @@ func SequenceTest() {
 
 		for symbol, symbolC := range symbolView[0] {
 			if config.SymbolIsWay(symbol) {
-				times = int32(symbolC)
+				times = int64(symbolC)
 				ofAKind = 1
 				for index, reels := range symbolView[1:] {
 					if (reels[symbol] == 0) && (reels["Z"] == 0) {
 						break
 					}
-					times *= int32(reels[symbol] + reels["Z"])
+					times *= int64(reels[symbol] + reels["Z"])
 					ofAKind = index + 2
 				}
 				report.AccumulateCombinations(symbol, ofAKind, times)
@@ -120,6 +130,55 @@ func SequenceTest() {
 	}
 
 	fmt.Println(symbolView)
+	report.PrintTotals()
+	fmt.Println("Combinations")
+	report.PrintCombinations()
+	fmt.Println("Pays")
+	report.PrintPays()
+}
+
+// RandomTest performs testSpins spins of a slot game
+func RandomTest(testSpins uint32) {
+	var spin uint32
+	var times int64
+	var ofAKind int
+	var scatters int
+
+	for spin = 0; spin < testSpins; spin += 1 {
+		symbolView = setRandomReelView()
+
+		report.AccumulateTotal("count", 1)
+
+		scatters = 0
+		for _, symbols := range symbolView {
+			scatters += symbols["S"]
+		}
+		report.AccumulateCombinations("S", scatters, 1)
+
+		for symbol, symbolC := range symbolView[0] {
+			if config.SymbolIsWay(symbol) {
+				times = int64(symbolC)
+				ofAKind = 1
+				for index, reels := range symbolView[1:] {
+					if (reels[symbol] == 0) && (reels["Z"] == 0) {
+						break
+					}
+					times *= int64(reels[symbol] + reels["Z"])
+					ofAKind = index + 2
+				}
+				report.AccumulateCombinations(symbol, ofAKind, times)
+			}
+		}
+	}
+
+	for _, symbol := range config.Symbols() {
+		var payTable = config.SymbolPays(symbol)
+		for count, pay := range payTable {
+			var c = report.GetCombinations(symbol, count+1)
+			report.AccumulatePays(symbol, count+1, int64(c) * int64(pay))
+		}
+	}
+
 	report.PrintTotals()
 	fmt.Println("Combinations")
 	report.PrintCombinations()
