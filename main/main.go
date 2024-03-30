@@ -32,7 +32,13 @@ func RunSequenceTest() {
 	server.SequenceTest()
 }
 
+func RunRandomTest() {
+	server.Init("198.json")
+	server.RandomTest(1549762500)
+}
+
 func main() {
 	// LoadGame()
-	RunSequenceTest()
+	// RunSequenceTest()
+	RunRandomTest()
 }
