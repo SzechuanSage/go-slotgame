@@ -67,6 +67,26 @@ func setRandomReelView() []map[string]int {
 	return symbolView
 }
 
+func evaluateReelView() {
+	var times int64
+	var ofAKind int
+
+	for symbol, symbolC := range symbolView[0] {
+		if config.SymbolIsWay(symbol) {
+			times = int64(symbolC)
+			ofAKind = 1
+			for index, reels := range symbolView[1:] {
+				if (reels[symbol] == 0) && (reels["Z"] == 0) {
+					break
+				}
+				times *= int64(reels[symbol] + reels["Z"])
+				ofAKind = index + 2
+			}
+			report.AccumulateCombinations(symbol, ofAKind, times)
+		}
+	}
+}
+
 func produceReport() {
 	for _, symbol := range config.Symbols() {
 		var payTable = config.SymbolPays(symbol)
@@ -107,8 +127,6 @@ func Init(game string) {
 }
 
 func SequenceTest() {
-	var times int64
-	var ofAKind int
 	var scatters int
 
 	for hasNextSequence() {
@@ -122,20 +140,7 @@ func SequenceTest() {
 		}
 		report.AccumulateCombinations("S", scatters, 1)
 
-		for symbol, symbolC := range symbolView[0] {
-			if config.SymbolIsWay(symbol) {
-				times = int64(symbolC)
-				ofAKind = 1
-				for index, reels := range symbolView[1:] {
-					if (reels[symbol] == 0) && (reels["Z"] == 0) {
-						break
-					}
-					times *= int64(reels[symbol] + reels["Z"])
-					ofAKind = index + 2
-				}
-				report.AccumulateCombinations(symbol, ofAKind, times)
-			}
-		}
+		evaluateReelView()
 	}
 
 	produceReport()
@@ -144,8 +149,6 @@ func SequenceTest() {
 // RandomTest performs testSpins spins of a slot game
 func RandomTest(testSpins uint32) {
 	var spin uint32
-	var times int64
-	var ofAKind int
 	var scatters int
 
 	for spin = 0; spin < testSpins; spin += 1 {
@@ -159,20 +162,7 @@ func RandomTest(testSpins uint32) {
 		}
 		report.AccumulateCombinations("S", scatters, 1)
 
-		for symbol, symbolC := range symbolView[0] {
-			if config.SymbolIsWay(symbol) {
-				times = int64(symbolC)
-				ofAKind = 1
-				for index, reels := range symbolView[1:] {
-					if (reels[symbol] == 0) && (reels["Z"] == 0) {
-						break
-					}
-					times *= int64(reels[symbol] + reels["Z"])
-					ofAKind = index + 2
-				}
-				report.AccumulateCombinations(symbol, ofAKind, times)
-			}
-		}
+		evaluateReelView()
 	}
 
 	produceReport()
