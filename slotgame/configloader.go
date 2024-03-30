@@ -21,13 +21,17 @@ type GameScatter struct {
 	Symbol string
 }
 
+type GameReelSet struct {
+	Name  string
+	Reels [][]string
+}
+
 type Game struct {
 	Name      string
 	Symbols   []GameSymbol
 	Wilds     []GameWild
 	Scatters  []GameScatter
-	Base      [][]string
-	FreeReels [][]string
+	ReelSets  []GameReelSet
 }
 
 func ConfigLoader(file string) (Game, error) {
