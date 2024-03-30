@@ -48,22 +48,22 @@ func advanceSequence() {
 	}
 }
 
-func setNextReelView() []map[string]int {
+func setNextReelView(reelSetName string) []map[string]int {
 	if !isNextSequence() {
 		endOfSequence = true
 	}
-	_, symbolView := config.GetReelView(indexes, "reels")
+	_, symbolView := config.GetReelView(indexes, reelSetName)
 	if !endOfSequence {
 		advanceSequence()
 	}
 	return symbolView
 }
 
-func setRandomReelView() []map[string]int {
+func setRandomReelView(reelSetName string) []map[string]int {
 	for x, y := range loopTo {
 		indexes[x] = rand.Intn(y)
 	}
-	_, symbolView := config.GetReelView(indexes, "reels")
+	_, symbolView := config.GetReelView(indexes, reelSetName)
 	return symbolView
 }
 
@@ -113,24 +113,24 @@ func Init(game string) {
 	config = slotgame.GetConfig(gameConfig)
 
 	reels = config.Reels()
-	reelSet = config.ReelSet("reels")
 
 	report = slotgame.InitReport(config.Symbols(), config.Reels())
 
 	indexes = make([]int, config.Reels())
 	loopTo = make([]int, config.Reels())
 	endOfSequence = false
+}
 
+func SequenceTest(reelSetName string) {
+	var scatters int
+
+	reelSet = config.ReelSet(reelSetName)
 	for x, y := range reelSet {
 		loopTo[x] = len(y)
 	}
-}
-
-func SequenceTest() {
-	var scatters int
 
 	for hasNextSequence() {
-		symbolView = setNextReelView()
+		symbolView = setNextReelView(reelSetName)
 
 		report.AccumulateTotal("count", 1)
 
@@ -147,12 +147,17 @@ func SequenceTest() {
 }
 
 // RandomTest performs testSpins spins of a slot game
-func RandomTest(testSpins uint32) {
+func RandomTest(reelSetName string, testSpins uint32) {
 	var spin uint32
 	var scatters int
 
+	reelSet = config.ReelSet(reelSetName)
+	for x, y := range reelSet {
+		loopTo[x] = len(y)
+	}
+
 	for spin = 0; spin < testSpins; spin += 1 {
-		symbolView = setRandomReelView()
+		symbolView = setRandomReelView(reelSetName)
 
 		report.AccumulateTotal("count", 1)
 
