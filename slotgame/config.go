@@ -57,26 +57,26 @@ func GetConfig(gameConfig Game) Config {
 	var baseReelSet = reelSet{}
 	baseReelSet.rows = []int{3, 5, 5, 5, 3}
 	baseReelSet.reels = make([][]string, 5)
-	baseReelSet.reels[0] = append(baseReelSet.reels[0], gameConfig.Base[0]...)
-	baseReelSet.reels[1] = append(baseReelSet.reels[1], gameConfig.Base[1]...)
-	baseReelSet.reels[2] = append(baseReelSet.reels[2], gameConfig.Base[2]...)
-	baseReelSet.reels[3] = append(baseReelSet.reels[3], gameConfig.Base[3]...)
-	baseReelSet.reels[4] = append(baseReelSet.reels[4], gameConfig.Base[4]...)
+	baseReelSet.reels[0] = append(baseReelSet.reels[0], gameConfig.ReelSets[0].Reels[0]...)
+	baseReelSet.reels[1] = append(baseReelSet.reels[1], gameConfig.ReelSets[0].Reels[1]...)
+	baseReelSet.reels[2] = append(baseReelSet.reels[2], gameConfig.ReelSets[0].Reels[2]...)
+	baseReelSet.reels[3] = append(baseReelSet.reels[3], gameConfig.ReelSets[0].Reels[3]...)
+	baseReelSet.reels[4] = append(baseReelSet.reels[4], gameConfig.ReelSets[0].Reels[4]...)
 	baseReelSet.reelDisplay = makeReelDisplay(baseReelSet)
 	baseReelSet.symbolCount = makeSymbolCount(baseReelSet.reelDisplay)
-	config.reelSets["reels"] = baseReelSet
+	config.reelSets[gameConfig.ReelSets[0].Name] = baseReelSet
 
 	var freeReelSet = reelSet{}
 	freeReelSet.rows = []int{3, 5, 5, 5, 3}
 	freeReelSet.reels = make([][]string, 5)
-	freeReelSet.reels[0] = append(freeReelSet.reels[0], gameConfig.FreeReels[0]...)
-	freeReelSet.reels[1] = append(freeReelSet.reels[1], gameConfig.FreeReels[1]...)
-	freeReelSet.reels[2] = append(freeReelSet.reels[2], gameConfig.FreeReels[2]...)
-	freeReelSet.reels[3] = append(freeReelSet.reels[3], gameConfig.FreeReels[3]...)
-	freeReelSet.reels[4] = append(freeReelSet.reels[4], gameConfig.FreeReels[4]...)
+	freeReelSet.reels[0] = append(freeReelSet.reels[0], gameConfig.ReelSets[1].Reels[0]...)
+	freeReelSet.reels[1] = append(freeReelSet.reels[1], gameConfig.ReelSets[1].Reels[1]...)
+	freeReelSet.reels[2] = append(freeReelSet.reels[2], gameConfig.ReelSets[1].Reels[2]...)
+	freeReelSet.reels[3] = append(freeReelSet.reels[3], gameConfig.ReelSets[1].Reels[3]...)
+	freeReelSet.reels[4] = append(freeReelSet.reels[4], gameConfig.ReelSets[1].Reels[4]...)
 	freeReelSet.reelDisplay = makeReelDisplay(freeReelSet)
 	freeReelSet.symbolCount = makeSymbolCount(freeReelSet.reelDisplay)
-	config.reelSets["freeReels"] = freeReelSet
+	config.reelSets[gameConfig.ReelSets[1].Name] = freeReelSet
 
 	return config
 }
