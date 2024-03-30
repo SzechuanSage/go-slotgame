@@ -23,18 +23,22 @@ func LoadGame() {
 	log.Printf("Config symbols: %v", payload.Symbols[0].Symbol)
 	log.Printf("Config wilds: %v", payload.Wilds[0])
 	log.Printf("Config scatters: %v", payload.Scatters[0])
-	log.Printf("Config base: %v", payload.Base[0])
-	log.Printf("Config freeReels: %v", payload.FreeReels[0])
+	log.Printf("Config base: %v", payload.ReelSets[0])
+	log.Printf("Config freeReels: %v", payload.ReelSets[1])
 }
 
 func RunSequenceTest() {
 	server.Init("198.json")
-	server.SequenceTest()
+	server.SequenceTest("base")
+	// server.Init("198.json")
+	// server.SequenceTest("free")
 }
 
 func RunRandomTest() {
 	server.Init("198.json")
-	server.RandomTest(1549762500)
+	server.RandomTest("base", 1e8)
+	server.Init("198.json")
+	server.RandomTest("free", 1e8)
 }
 
 func main() {
