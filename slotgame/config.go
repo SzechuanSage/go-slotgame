@@ -55,7 +55,7 @@ func GetConfig(gameConfig Game) Config {
 	sort.Strings(config.symbolIds)
 
 	var baseReelSet = reelSet{}
-	baseReelSet.rows = []int{3, 5, 5, 5, 3}
+	baseReelSet.rows = []int{3, 3, 3, 3, 3}
 	baseReelSet.reels = make([][]string, 5)
 	baseReelSet.reels[0] = append(baseReelSet.reels[0], gameConfig.ReelSets[0].Reels[0]...)
 	baseReelSet.reels[1] = append(baseReelSet.reels[1], gameConfig.ReelSets[0].Reels[1]...)
@@ -67,7 +67,7 @@ func GetConfig(gameConfig Game) Config {
 	config.reelSets[gameConfig.ReelSets[0].Name] = baseReelSet
 
 	var freeReelSet = reelSet{}
-	freeReelSet.rows = []int{3, 5, 5, 5, 3}
+	freeReelSet.rows = []int{3, 3, 3, 3, 3}
 	freeReelSet.reels = make([][]string, 5)
 	freeReelSet.reels[0] = append(freeReelSet.reels[0], gameConfig.ReelSets[1].Reels[0]...)
 	freeReelSet.reels[1] = append(freeReelSet.reels[1], gameConfig.ReelSets[1].Reels[1]...)
